@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Thinkorix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div id="appbar" class="appbar"></div>
+
+<main>
+<div class="page wrap">
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">Operations</div>
+      <h1>Admin Dashboard</h1>
+      <p>Role-based control over users, projects, certificates, applications, and analytics.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-4" id="stats" style="margin-bottom:28px;">
+    <div class="loading-block"><div class="spinner"></div></div>
+  </div>
+
+  <div class="grid grid-3" style="margin-bottom:28px;">
+    <a class="portal-card" href="portal-internship.html"><h4 style="font-size:14.5px;margin-bottom:4px;">Internship Portal →</h4><p class="hint">Manage applicants, mentors, tasks</p></a>
+    <a class="portal-card" href="portal-verify.html"><h4 style="font-size:14.5px;margin-bottom:4px;">Certificate Verification →</h4><p class="hint">Look up and verify certificates</p></a>
+    <a class="portal-card" href="portal-research.html"><h4 style="font-size:14.5px;margin-bottom:4px;">Research Cell →</h4><p class="hint">Publish papers, patents, projects</p></a>
+    <a class="portal-card" href="portal-ideas.html"><h4 style="font-size:14.5px;margin-bottom:4px;">Idea Submissions →</h4><p class="hint">Review pitched ideas</p></a>
+    <a class="portal-card" href="portal-client.html"><h4 style="font-size:14.5px;margin-bottom:4px;">Client Portal →</h4><p class="hint">Track client project delivery</p></a>
+  </div>
+
+  <div class="page-head" style="margin-bottom:16px;">
+    <div><h1 style="font-size:19px;">Reviews</h1><p>Approve or reject reviews submitted on the homepage before they go public.</p></div>
+  </div>
+  <div class="table-wrap" id="reviews-wrap" style="margin-bottom:28px;"><div class="loading-block"><div class="spinner"></div></div></div>
+
+  <div class="page-head" style="margin-bottom:16px;">
+    <div><h1 style="font-size:19px;">Contact messages</h1><p>Submissions from the "Tell us what you're building" form on the homepage.</p></div>
+  </div>
+  <div class="table-wrap" id="messages-wrap" style="margin-bottom:28px;"><div class="loading-block"><div class="spinner"></div></div></div>
+
+  <div class="page-head" style="margin-bottom:16px;">
+    <div><h1 style="font-size:19px;">Users</h1><p>Every account, across every portal. Change a role to move someone between portals.</p></div>
+  </div>
+  <div class="table-wrap" id="users-wrap"><div class="loading-block"><div class="spinner"></div></div></div>
+</div>
+</main>
+
+<div id="toast"></div>
+
+<script src="js/api.js"></script>
+<script>
+if (THX.requireLogin({ roles: ['admin'] })) {
+  THX.renderAppbar({ title: 'Admin Dashboard' });
+  const ROLES = ['admin', 'mentor', 'intern', 'client', 'contributor'];
+
+  async function loadStats() {
+    const el = document.getElementById('stats');
+    try {
+      const a = await THX.api('/api/admin/analytics');
+      el.innerHTML = `
+        <div class="stat-card"><div class="num">${a.interns.total}</div><div class="lbl">Interns (${a.interns.active} active)</div></div>
+        <div class="stat-card"><div class="num">${a.ideas.total}</div><div class="lbl">Ideas (${a.ideas.pending} pending)</div></div>
+        <div class="stat-card"><div class="num">${a.research.total}</div><div class="lbl">Research entries</div></div>
+        <div class="stat-card"><div class="num">${a.clientProjects.total}</div><div class="lbl">Client projects</div></div>
+        <div class="stat-card"><div class="num">${a.users.total}</div><div class="lbl">Total users</div></div>
+      `;
+    } catch (ex) { el.innerHTML = `<div class="alert alert-error show">${ex.message}</div>`; }
+  }
+  loadStats();
+
+  async function loadMessages() {
+    const wrap = document.getElementById('messages-wrap');
+    try {
+      const data = await THX.api('/api/contact');
+      if (!data.messages.length) {
+        wrap.innerHTML = `<div class="empty-state">No messages yet.</div>`;
+        return;
+      }
+      wrap.innerHTML = `<table><thead><tr><th>From</th><th>Message</th><th>Received</th><th>Status</th><th></th></tr></thead><tbody>
+        ${data.messages.map(m => `<tr>
+          <td><b>${THX.escapeHtml(m.name)}</b><br><span class="hint">${THX.escapeHtml(m.email)}</span></td>
+          <td style="max-width:360px;white-space:pre-wrap;">${THX.escapeHtml(m.message || '—')}</td>
+          <td>${THX.fmtDate(m.createdAt)}</td>
+          <td><span class="tag ${m.read ? 'tag-green' : 'tag-red'}" data-toggle="${m.id}" style="cursor:pointer;">${m.read ? 'Read' : 'Unread'}</span></td>
+          <td><button class="icon-btn" data-del="${m.id}" title="Delete" aria-label="Delete">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+          </button></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+      wrap.querySelectorAll('[data-toggle]').forEach(el => el.addEventListener('click', async () => {
+        try { await THX.api(`/api/contact/${el.dataset.toggle}/read`, { method: 'PATCH', body: { read: el.textContent.trim() !== 'Read' } }); loadMessages(); }
+        catch (ex) { THX.toast(ex.message, true); }
+      }));
+      wrap.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('Delete this message?')) return;
+        try { await THX.api(`/api/contact/${btn.dataset.del}`, { method: 'DELETE' }); THX.toast('Deleted'); loadMessages(); }
+        catch (ex) { THX.toast(ex.message, true); }
+      }));
+    } catch (ex) { wrap.innerHTML = `<div class="alert alert-error show">${ex.message}</div>`; }
+  }
+  loadMessages();
+
+  async function loadReviews() {
+    const wrap = document.getElementById('reviews-wrap');
+    try {
+      const data = await THX.api('/api/reviews');
+      if (!data.reviews.length) {
+        wrap.innerHTML = `<div class="empty-state">No reviews yet.</div>`;
+        return;
+      }
+      const statusTag = s => s === 'approved' ? 'tag-green' : s === 'rejected' ? 'tag-red' : 'tag';
+      wrap.innerHTML = `<table><thead><tr><th>From</th><th>Rating</th><th>Review</th><th>Received</th><th>Status</th><th></th></tr></thead><tbody>
+        ${data.reviews.map(r => `<tr>
+          <td><b>${THX.escapeHtml(r.name)}</b>${r.role ? `<br><span class="hint">${THX.escapeHtml(r.role)}</span>` : ''}</td>
+          <td>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</td>
+          <td style="max-width:320px;white-space:pre-wrap;">${THX.escapeHtml(r.message)}</td>
+          <td>${THX.fmtDate(r.createdAt)}</td>
+          <td><span class="tag ${statusTag(r.status)}">${r.status}</span></td>
+          <td style="white-space:nowrap;">
+            <button class="btn btn-ghost btn-sm" data-approve="${r.id}">Approve</button>
+            <button class="btn btn-ghost btn-sm" data-reject="${r.id}">Reject</button>
+            <button class="icon-btn" data-del="${r.id}" title="Delete" aria-label="Delete">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            </button>
+          </td>
+        </tr>`).join('')}
+      </tbody></table>`;
+      wrap.querySelectorAll('[data-approve]').forEach(b => b.addEventListener('click', async () => {
+        try { await THX.api(`/api/reviews/${b.dataset.approve}/status`, { method: 'PATCH', body: { status: 'approved' } }); THX.toast('Review approved'); loadReviews(); }
+        catch (ex) { THX.toast(ex.message, true); }
+      }));
+      wrap.querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', async () => {
+        try { await THX.api(`/api/reviews/${b.dataset.reject}/status`, { method: 'PATCH', body: { status: 'rejected' } }); THX.toast('Review rejected'); loadReviews(); }
+        catch (ex) { THX.toast(ex.message, true); }
+      }));
+      wrap.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('Delete this review?')) return;
+        try { await THX.api(`/api/reviews/${btn.dataset.del}`, { method: 'DELETE' }); THX.toast('Deleted'); loadReviews(); }
+        catch (ex) { THX.toast(ex.message, true); }
+      }));
+    } catch (ex) { wrap.innerHTML = `<div class="alert alert-error show">${ex.message}</div>`; }
+  }
+  loadReviews();
+
+  async function loadUsers() {
+    const wrap = document.getElementById('users-wrap');
+    try {
+      const data = await THX.api('/api/admin/users');
+      wrap.innerHTML = `<table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Change role</th></tr></thead><tbody>
+        ${data.users.map(u => `<tr>
+          <td>${THX.escapeHtml(u.name)}</td>
+          <td>${THX.escapeHtml(u.email)}</td>
+          <td><span class="tag tag-green">${u.role}</span></td>
+          <td><select data-user="${u.id}" style="width:auto;padding:6px 8px;">${ROLES.map(r => `<option value="${r}" ${r === u.role ? 'selected' : ''}>${r}</option>`).join('')}</select></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+      wrap.querySelectorAll('[data-user]').forEach(sel => sel.addEventListener('change', async (e) => {
+        try { await THX.api(`/api/admin/users/${e.target.dataset.user}/role`, { method: 'PATCH', body: { role: e.target.value } }); THX.toast('Role updated'); loadStats(); }
+        catch (ex) { THX.toast(ex.message, true); }
+      }));
+    } catch (ex) { wrap.innerHTML = `<div class="alert alert-error show">${ex.message}</div>`; }
+  }
+  loadUsers();
+}
+</script>
+</body>
+</html>
