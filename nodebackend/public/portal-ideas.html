@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idea Submission Portal — Thinkorix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div id="appbar" class="appbar"></div>
+
+<main>
+<div class="page wrap" id="page-root">
+  <div class="loading-block"><div class="spinner"></div></div>
+</div>
+</main>
+
+<div id="toast"></div>
+
+<script src="js/api.js"></script>
+<script>
+if (THX.requireLogin()) {
+  THX.renderAppbar({ title: 'Idea Submission Portal' });
+  const user = THX.getUser();
+  const isAdmin = user.role === 'admin';
+  const root = document.getElementById('page-root');
+  const STATUS_TAG = { pending: 'tag-amber', approved: 'tag-green', rejected: 'tag-red' };
+
+  root.innerHTML = `
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Ideas</div>
+        <h1>Idea Submission Portal</h1>
+        <p>Students and employees pitch product, research, and hardware ideas for admin review and approval.</p>
+      </div>
+    </div>
+    <div class="tabs">
+      ${isAdmin ? `<div class="tab active" data-tab="review">Review queue</div>` : `<div class="tab active" data-tab="submit">Submit an idea</div><div class="tab" data-tab="mine">My submissions</div>`}
+    </div>
+    <div class="tab-panel active" id="panel-${isAdmin ? 'review' : 'submit'}"></div>
+    ${!isAdmin ? '<div class="tab-panel" id="panel-mine"></div>' : ''}
+  `;
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+    if (t.dataset.tab === 'mine') loadMine();
+  }));
+
+  if (!isAdmin) {
+    document.getElementById('panel-submit').innerHTML = `
+      <div class="card" style="max-width:640px;">
+        <div class="alert alert-error" id="s-err"></div>
+        <div class="alert alert-success" id="s-ok"></div>
+        <form id="idea-form">
+          <div class="field"><label>Title</label><input id="i-title" required></div>
+          <div class="field"><label>Description</label><textarea id="i-desc" required placeholder="What's the idea? What problem does it solve?"></textarea></div>
+          <div class="field-row">
+            <div class="field"><label>Your name</label><input id="i-name" value="${THX.escapeHtml(user.name)}" required></div>
+            <div class="field"><label>Your email</label><input id="i-email" type="email" value="${THX.escapeHtml(user.email)}" required></div>
+          </div>
+          <div class="field">
+            <label>I'm a</label>
+            <select id="i-type"><option value="student">Student</option><option value="employee">Employee</option></select>
+          </div>
+          <div class="field"><label>Attachments (optional, up to 5)</label><input id="i-files" type="file" multiple></div>
+          <button class="btn btn-primary btn-block" id="idea-submit" type="submit">Submit idea</button>
+        </form>
+      </div>`;
+    document.getElementById('idea-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('s-err'), ok = document.getElementById('s-ok');
+      err.classList.remove('show'); ok.classList.remove('show');
+      const btn = document.getElementById('idea-submit');
+      btn.disabled = true; btn.textContent = 'Submitting…';
+      try {
+        const fd = new FormData();
+        fd.append('title', document.getElementById('i-title').value.trim());
+        fd.append('description', document.getElementById('i-desc').value.trim());
+        fd.append('submitterName', document.getElementById('i-name').value.trim());
+        fd.append('submitterEmail', document.getElementById('i-email').value.trim());
+        fd.append('submitterType', document.getElementById('i-type').value);
+        for (const f of document.getElementById('i-files').files) fd.append('attachments', f);
+        await THX.api('/api/ideas', { method: 'POST', body: fd });
+        ok.textContent = 'Idea submitted — an admin will review it soon.';
+        ok.classList.add('show');
+        document.getElementById('idea-form').reset();
+        THX.toast('Idea submitted');
+      } catch (ex) { err.textContent = ex.message; err.classList.add('show'); }
+      finally { btn.disabled = false; btn.textContent = 'Submit idea'; }
+    });
+
+    async function loadMine() {
+      const panel = document.getElementById('panel-mine');
+      panel.innerHTML = `<div class="loading-block"><div class="spinner"></div></div>`;
+      try {
+        const data = await THX.api('/api/ideas/mine', { auth: false, query: { email: user.email } });
+        panel.innerHTML = data.ideas.length ? `<div class="row-list">${data.ideas.map(i => `
+          <div class="row-item"><div class="main"><h4>${THX.escapeHtml(i.title)}</h4><div class="meta">${THX.escapeHtml(i.description)}</div>${i.reviewNote ? `<div class="hint" style="margin-top:6px;">Note: ${THX.escapeHtml(i.reviewNote)}</div>` : ''}</div>
+          <span class="tag ${STATUS_TAG[i.status]}">${i.status}</span></div>`).join('')}</div>`
+          : `<div class="empty-state">You haven't submitted any ideas yet.</div>`;
+      } catch (ex) { panel.innerHTML = `<div class="alert alert-error show">${ex.message}</div>`; }
+    }
+  } else {
+    async function loadReview() {
+      const panel = document.getElementById('panel-review');
+      panel.innerHTML = `<div class="loading-block"><div class="spinner"></div></div>`;
+      try {
+        const data = await THX.api('/api/ideas');
+        panel.innerHTML = data.ideas.length ? `<div class="row-list">${data.ideas.map(i => `
+          <div class="row-item" style="align-items:flex-start;">
+            <div class="main">
+              <h4>${THX.escapeHtml(i.title)}</h4>
+              <div class="meta">${THX.escapeHtml(i.submitterName)} (${i.submitterType}) · ${THX.escapeHtml(i.submitterEmail)}</div>
+              <p style="font-size:13px;color:var(--ink-soft);margin-top:6px;">${THX.escapeHtml(i.description)}</p>
+              ${i.attachments && i.attachments.length ? `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">${i.attachments.map(a => `<a href="${a.url}" target="_blank" class="tag tag-slate">${THX.escapeHtml(a.originalName)}</a>`).join('')}</div>` : ''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+              <span class="tag ${STATUS_TAG[i.status]}">${i.status}</span>
+              <div class="row-actions">
+                <button class="btn btn-sm btn-primary" data-review="${i.id}" data-status="approved">Approve</button>
+                <button class="btn btn-sm btn-danger" data-review="${i.id}" data-status="rejected">Reject</button>
+              </div>
+            </div>
+          </div>`).join('')}</div>`
+          : `<div class="empty-state">No ideas submitted yet.</div>`;
+        panel.querySelectorAll('[data-review]').forEach(b => b.addEventListener('click', async () => {
+          const note = prompt('Optional note for the submitter:') || '';
+          try { await THX.api(`/api/ideas/${b.dataset.review}/review`, { method: 'PATCH', body: { status: b.dataset.status, reviewNote: note } }); THX.toast('Updated'); loadReview(); }
+          catch (ex) { THX.toast(ex.message, true); }
+        }));
+      } catch (ex) { panel.innerHTML = `<div class="alert alert-error show">${ex.message}</div>`; }
+    }
+    loadReview();
+  }
+}
+</script>
+</body>
+</html>
