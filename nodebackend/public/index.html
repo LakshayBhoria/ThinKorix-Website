@@ -9,7 +9,7 @@
   (function(){
     try{
       var saved = localStorage.getItem('thinkorix-theme');
-      var theme = saved ||'light';
+      var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       document.documentElement.setAttribute('data-theme', theme);
     }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
   })();
@@ -219,6 +219,7 @@
   }
   @keyframes art-float{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-12px) rotate(1deg);}}
   
+  /* Glowing backdrop ring */
   .logo-ring-glow{
     position:absolute;inset:-20px;border-radius:50%;
     background:conic-gradient(from 0deg, var(--green), transparent, var(--green-deep), transparent, var(--green));
@@ -226,6 +227,7 @@
   }
   @keyframes spin-glow{to{transform:rotate(360deg);}}
 
+  /* Animated SVG Logo Styling matching logo.jpeg precisely */
   .animated-logo-svg{
     width:220px;height:220px;position:relative;z-index:2;
     filter:drop-shadow(0 20px 30px var(--shadow-color));
@@ -249,6 +251,7 @@
   @keyframes pulse-t-top{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
   @keyframes pulse-t-stem{0%,100%{transform:scaleY(1);}50%{transform:scaleY(1.06);}}
 
+  /* Floating orbital companion tags mimicking your modules cleanly around the logo */
   .orbit-badge{
     position:absolute;background:var(--onyx);color:#fff;font-family:var(--mono);
     font-size:10.5px;letter-spacing:.05em;padding:8px 14px;border-radius:100px;
@@ -284,38 +287,12 @@
 
   /* SERVICES */
   .service-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;}
-  .service-card{background:var(--paper);padding:30px 26px;transition:background .2s ease, transform .2s ease;position:relative;cursor:pointer;}
+  .service-card{background:var(--paper);padding:30px 26px;transition:background .2s ease, transform .2s ease;position:relative;}
   .service-card:hover{background:var(--mist);transform:translateY(-3px);z-index:2;}
-  .service-card:focus-visible{outline:2px solid var(--green);outline-offset:-2px;}
   .s-num{font-family:var(--mono);font-size:12px;color:var(--slate);transition:color .2s ease;}
   .service-card:hover .s-num{color:var(--green-deep);}
   .service-card h3{font-size:17px;margin:14px 0 8px;}
   .service-card p{font-size:13.5px;color:var(--slate);}
-
-  /* SERVICE DETAIL MODAL */
-  #service-modal-backdrop{
-    position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:none;
-    align-items:center;justify-content:center;padding:20px;
-  }
-  #service-modal-backdrop.open{display:flex;}
-  #service-modal{
-    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
-    padding:32px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;
-    box-shadow:0 30px 60px -20px var(--shadow-color);position:relative;
-  }
-  #service-modal .sm-close{
-    position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:50%;
-    border:1px solid var(--line);background:var(--mist);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);
-  }
-  #service-modal .sm-close:hover{border-color:var(--green);}
-  #service-modal .sm-tag{font-family:var(--mono);font-size:11px;color:var(--green);background:var(--green-tint);padding:5px 10px;border-radius:100px;display:inline-block;margin-bottom:14px;}
-  #service-modal h3{font-size:22px;margin-bottom:12px;padding-right:30px;}
-  #service-modal p.sm-desc{color:var(--slate);font-size:14.5px;margin-bottom:18px;}
-  #service-modal ul{list-style:none;margin-bottom:24px;}
-  #service-modal ul li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-soft);padding:7px 0;border-top:1px solid var(--line);}
-  #service-modal ul li:first-child{border-top:none;}
-  #service-modal ul li svg{flex-shrink:0;margin-top:2px;color:var(--green);}
-  #service-modal .sm-actions{display:flex;gap:10px;flex-wrap:wrap;}
 
   /* MODULES (platform pillars) */
   .modules-bg{background:var(--onyx);color:#fff;}
@@ -446,14 +423,6 @@
   footer li a{position:relative;}
   footer li a:hover{color:#fff;}
   .foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:22px;font-size:12.5px;display:flex;justify-content:space-between;}
-  <div class="foot-social">
-  <a href="https://www.linkedin.com/company/thinkorix" target="_blank" rel="noopener" aria-label="Thinkorix on LinkedIn">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.44-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-  </a>
-  <a href="https://www.instagram.com/thinkorix_official/" target="_blank" rel="noopener" aria-label="Thinkorix on Instagram">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
-  </a>
-</div>
 
   [data-reveal]{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease;}
   [data-reveal].in{opacity:1;transform:translateY(0);}
@@ -540,14 +509,7 @@
   <a href="#blog">Blog</a>
   <a href="#contact">Contact</a>
   <div id="auth-drawer-slot" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;"></div>
-  <div class="drawer-social">
-    <a href="https://www.linkedin.com/company/thinkorix" target="_blank" rel="noopener" aria-label="Thinkorix on LinkedIn">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.44-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-    </a>
-    <a href="https://www.instagram.com/thinkorix_official/" target="_blank" rel="noopener" aria-label="Thinkorix on Instagram">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
-    </a>
- </div>
+</div>
 
 <main id="home">
   <section class="hero" id="hero-section">
@@ -568,12 +530,19 @@
         <div class="animated-logo-container">
           <div class="logo-ring-glow"></div>
           
+          <!-- Exact Vector Representation of your logo.jpeg with smooth SVG animations -->
           <svg class="animated-logo-svg" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded Square Outer Box Outline matching logo.jpeg -->
             <rect class="logo-outer-box" x="35" y="35" width="230" height="230" rx="55" />
+            
+            <!-- Horizontal Bar of 'T' -->
             <rect class="logo-t-top" x="82" y="85" width="136" height="36" rx="18" />
+            
+            <!-- Vertical Stem of 'T' -->
             <rect class="logo-t-stem" x="132" y="112" width="36" height="110" rx="18" />
           </svg>
 
+          <!-- Floating Orbiting Badges -->
           <div class="orbit-badge green badge-1">INTERNSHIPS</div>
           <div class="orbit-badge badge-2">ROBOTICS</div>
           <div class="orbit-badge badge-3">ML PIPELINE</div>
@@ -601,18 +570,18 @@
         <p>Every engagement draws from the same in-house bench — no handoffs between agencies.</p>
       </div>
       <div class="service-grid stagger">
-        <div class="service-card" data-service="ai-ml" tabindex="0" role="button"><div class="s-num">01</div><h3>AI &amp; Machine Learning</h3><p>Model development, fine-tuning, and MLOps.</p></div>
-        <div class="service-card" data-service="web-dev" tabindex="0" role="button"><div class="s-num">02</div><h3>Web Development</h3><p>Full-stack products on modern frameworks.</p></div>
-        <div class="service-card" data-service="mobile-dev" tabindex="0" role="button"><div class="s-num">03</div><h3>Mobile App Development</h3><p>Native and cross-platform apps.</p></div>
-        <div class="service-card" data-service="ui-ux" tabindex="0" role="button"><div class="s-num">04</div><h3>UI/UX Design</h3><p>Research-driven product design systems.</p></div>
-        <div class="service-card" data-service="cloud-devops" tabindex="0" role="button"><div class="s-num">05</div><h3>Cloud &amp; DevOps</h3><p>Infrastructure, CI/CD, and reliability.</p></div>
-        <div class="service-card" data-service="data-science" tabindex="0" role="button"><div class="s-num">06</div><h3>Data Science</h3><p>Analytics, forecasting, and data platforms.</p></div>
-        <div class="service-card" data-service="rnd" tabindex="0" role="button"><div class="s-num">07</div><h3>Research &amp; Development</h3><p>Applied research from idea to prototype.</p></div>
-        <div class="service-card" data-service="consulting" tabindex="0" role="button"><div class="s-num">08</div><h3>Digital Consulting</h3><p>Technology strategy and roadmapping.</p></div>
-        <div class="service-card" data-service="hardware" tabindex="0" role="button"><div class="s-num">09</div><h3>Hardware Development</h3><p>PCB design through production.</p></div>
-        <div class="service-card" data-service="embedded" tabindex="0" role="button"><div class="s-num">10</div><h3>Embedded Systems</h3><p>Firmware for constrained devices.</p></div>
-        <div class="service-card" data-service="robotics" tabindex="0" role="button"><div class="s-num">11</div><h3>Robotics</h3><p>Perception, control, and autonomy.</p></div>
-        <div class="service-card" data-service="iot" tabindex="0" role="button"><div class="s-num">12</div><h3>IoT Solutions</h3><p>Connected devices at fleet scale.</p></div>
+        <div class="service-card"><div class="s-num">01</div><h3>AI &amp; Machine Learning</h3><p>Model development, fine-tuning, and MLOps.</p></div>
+        <div class="service-card"><div class="s-num">02</div><h3>Web Development</h3><p>Full-stack products on modern frameworks.</p></div>
+        <div class="service-card"><div class="s-num">03</div><h3>Mobile App Development</h3><p>Native and cross-platform apps.</p></div>
+        <div class="service-card"><div class="s-num">04</div><h3>UI/UX Design</h3><p>Research-driven product design systems.</p></div>
+        <div class="service-card"><div class="s-num">05</div><h3>Cloud &amp; DevOps</h3><p>Infrastructure, CI/CD, and reliability.</p></div>
+        <div class="service-card"><div class="s-num">06</div><h3>Data Science</h3><p>Analytics, forecasting, and data platforms.</p></div>
+        <div class="service-card"><div class="s-num">07</div><h3>Research &amp; Development</h3><p>Applied research from idea to prototype.</p></div>
+        <div class="service-card"><div class="s-num">08</div><h3>Digital Consulting</h3><p>Technology strategy and roadmapping.</p></div>
+        <div class="service-card"><div class="s-num">09</div><h3>Hardware Development</h3><p>PCB design through production.</p></div>
+        <div class="service-card"><div class="s-num">10</div><h3>Embedded Systems</h3><p>Firmware for constrained devices.</p></div>
+        <div class="service-card"><div class="s-num">11</div><h3>Robotics</h3><p>Perception, control, and autonomy.</p></div>
+        <div class="service-card"><div class="s-num">12</div><h3>IoT Solutions</h3><p>Connected devices at fleet scale.</p></div>
       </div>
     </div>
   </section>
@@ -677,9 +646,9 @@
         <h2>Built by Thinkorix, used by teams.</h2>
       </div>
       <div class="product-grid stagger">
-        <div class="product-card"><div class="icon-block"></div><h3>Think-Vision</h3><p>Computer-vision inspection toolkit for manufacturing lines.</p><span class="price">From ₹49,000 / mo</span></div>
-        <div class="product-card"><div class="icon-block"></div><h3>Think Track</h3><p>Fleet and asset telemetry dashboard with anomaly alerts.</p><span class="price">From ₹29,000 / mo</span></div>
-        <div class="product-card"><div class="icon-block"></div><h3>Corseno Learn</h3><p>Cohort management for internship and training programs.</p><span class="price">From ₹15,000 / mo</span></div>
+        <div class="product-card"><div class="icon-block"></div><h3>Orix Vision</h3><p>Computer-vision inspection toolkit for manufacturing lines.</p><span class="price">From ₹49,000 / mo</span></div>
+        <div class="product-card"><div class="icon-block"></div><h3>Orix Track</h3><p>Fleet and asset telemetry dashboard with anomaly alerts.</p><span class="price">From ₹29,000 / mo</span></div>
+        <div class="product-card"><div class="icon-block"></div><h3>Orix Learn</h3><p>Cohort management for internship and training programs.</p><span class="price">From ₹15,000 / mo</span></div>
       </div>
     </div>
   </section>
@@ -691,8 +660,8 @@
         <h2>Work on problems that ship.</h2>
       </div>
       <div class="careers-list stagger">
-        <div class="job-row"><div><h4>Machine Learning Engineer</h4><div class="meta">Full-time · Roorkee· AI &amp; ML</div></div><a class="job-apply" href="#contact">Apply →</a></div>
-        <div class="job-row"><div><h4>Embedded Systems Engineer</h4><div class="meta">Full-time · Sonipat· Hardware</div></div><a class="job-apply" href="#contact">Apply →</a></div>
+        <div class="job-row"><div><h4>Machine Learning Engineer</h4><div class="meta">Full-time · Bengaluru · AI &amp; ML</div></div><a class="job-apply" href="#contact">Apply →</a></div>
+        <div class="job-row"><div><h4>Embedded Systems Engineer</h4><div class="meta">Full-time · Pune · Hardware</div></div><a class="job-apply" href="#contact">Apply →</a></div>
         <div class="job-row"><div><h4>Product Designer</h4><div class="meta">Full-time · Remote · UI/UX</div></div><a class="job-apply" href="#contact">Apply →</a></div>
         <div class="job-row"><div><h4>Internship Program Coordinator</h4><div class="meta">Full-time · Delhi · Operations</div></div><a class="job-apply" href="#contact">Apply →</a></div>
       </div>
@@ -719,29 +688,10 @@
         <span class="eyebrow">Testimonials</span>
         <h2>What clients and interns say.</h2>
       </div>
-      <div class="testi-grid stagger" id="testi-grid">
+      <div class="testi-grid stagger">
         <div class="testi-card"><p>"Thinkorix shipped our vision pipeline in six weeks — faster than any vendor we'd worked with before."</p><div class="testi-who">— VP Engineering, logistics client</div></div>
         <div class="testi-card"><p>"The internship dashboard made it obvious what I was behind on and what was next. No guessing."</p><div class="testi-who">— Summer intern cohort, 2026</div></div>
         <div class="testi-card"><p>"Their hardware team debugged a firmware issue our own engineers had missed for months."</p><div class="testi-who">— CTO, IoT client</div></div>
-      </div>
-
-      <div class="card" style="max-width:560px;margin:40px auto 0;" data-reveal>
-        <h3 style="font-size:16px;margin-bottom:14px;">Leave a review</h3>
-        <div class="alert alert-error" id="review-err"></div>
-        <div class="alert alert-success" id="review-ok"></div>
-        <form id="review-form" novalidate>
-          <div class="field"><label for="rv-name">Name</label><input id="rv-name" type="text" placeholder="Your full name"></div>
-          <div class="field"><label for="rv-role">Role (optional)</label><input id="rv-role" type="text" placeholder="e.g. Client, Summer Intern 2026"></div>
-          <div class="field">
-            <label>Rating</label>
-            <div id="rv-stars" style="display:flex;gap:6px;font-size:22px;line-height:1;cursor:pointer;" data-value="0">
-              <span data-star="1">☆</span><span data-star="2">☆</span><span data-star="3">☆</span><span data-star="4">☆</span><span data-star="5">☆</span>
-            </div>
-          </div>
-          <div class="field"><label for="rv-msg">Review</label><textarea id="rv-msg" rows="3" placeholder="What was it like working with us?"></textarea></div>
-          <button class="btn-primary" type="submit">Submit review</button>
-          <p class="hint" style="margin-top:8px;">Reviews are checked by our team before they appear publicly.</p>
-        </form>
       </div>
     </div>
   </section>
@@ -773,9 +723,9 @@
         </form>
       </div>
       <div class="contact-info">
-        <div class="row"><div class="dot"></div><div><h4>Office</h4><p>Thinkorix HQ, Sonipat, India</p></div></div>
-        <div class="row"><div class="dot"></div><div><h4>Email</h4><p>thinkorix@zohomail.in</p></div></div>
-        <div class="row"><div class="dot"></div><div><h4>Careers</h4><p>hr.thinkorix@gmail.com</p></div></div>
+        <div class="row"><div class="dot"></div><div><h4>Office</h4><p>Thinkorix HQ, New Delhi, India</p></div></div>
+        <div class="row"><div class="dot"></div><div><h4>Email</h4><p>hello@thinkorix.com</p></div></div>
+        <div class="row"><div class="dot"></div><div><h4>Careers</h4><p>careers@thinkorix.com</p></div></div>
         <div class="row"><div class="dot"></div><div><h4>Verify a certificate</h4><p>Have a certificate ID? Use the verification portal from your dashboard.</p></div></div>
       </div>
     </div>
@@ -788,19 +738,12 @@
       <div>
         <div class="foot-brand"><img src="logo.jpeg" alt="Thinkorix logo">Thinkorix</div>
         <p style="font-size:13.5px;max-width:280px;">Engineering AI, software, and hardware — and the people who build them.</p>
-        <div class="foot-social">
-         <a href="https://www.linkedin.com/company/thinkorix" target="_blank" rel="noopener" aria-label="Thinkorix on LinkedIn">
-           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.44-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-         </a>
-         <a href="https://www.instagram.com/thinkorix_official/" target="_blank" rel="noopener" aria-label="Thinkorix on Instagram">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
-         </a>
       </div>
       <div><h5>Company</h5><ul><li><a href="#home">About</a></li><li><a href="#projects">Projects</a></li><li><a href="#careers">Careers</a></li><li><a href="#blog">Blog</a></li></ul></div>
       <div><h5>Platform</h5><ul><li><a href="#modules">Internships</a></li><li><a href="#modules">Certificates</a></li><li><a href="#modules">Research</a></li><li><a href="#modules">Client Portal</a></li></ul></div>
       <div><h5>Services</h5><ul><li><a href="#services">AI &amp; ML</a></li><li><a href="#services">Web &amp; Mobile</a></li><li><a href="#services">Hardware</a></li><li><a href="#services">Cloud &amp; DevOps</a></li></ul></div>
-      <div><h5>Contact</h5><ul><li><a href="#contact">Start a project</a></li><li><a href="#contact">thinkorix@zohomail.in</a></li></ul></div>
-      <div><h5>Interns</h5><ul><li><a href="https://forms.gle/sB1R4CxWGDG7F7XXA" target="_blank" rel="noopener">Apply for Internship</a></li><li><a href="portal-verify.html">Verify Certificate</a></li></ul></div>
+      <div><h5>Contact</h5><ul><li><a href="#contact">Start a project</a></li><li><a href="#contact">hello@thinkorix.com</a></li></ul></div>
+      <div><h5>Interns</h5><ul><li><a href="portal-internship.html">Apply for Internship</a></li><li><a href="portal-verify.html">Verify Certificate</a></li></ul></div>
     </div>
     <div class="foot-bottom">
       <span>© 2026 Thinkorix. All rights reserved.</span>
@@ -812,15 +755,6 @@
 <button id="back-to-top" aria-label="Back to top">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
-
-<div id="service-modal-backdrop">
-  <div id="service-modal">
-    <button class="sm-close" id="sm-close" aria-label="Close">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
-    <div id="sm-body"></div>
-  </div>
-</div>
 
 <div id="toast">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
@@ -994,11 +928,10 @@ function showToast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
 }
-form.addEventListener('submit', async function(e){
+form.addEventListener('submit', function(e){
   e.preventDefault();
   const nameEl = document.getElementById('name');
-  const emailEl = document.getElementById('email');
-  const msgEl = document.getElementById('msg');
+  const emailEl = document.ейement || document.getElementById('email');
   const nameOk = nameEl.value.trim().length > 0;
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
   if (!nameOk || !emailOk){
@@ -1007,136 +940,9 @@ form.addEventListener('submit', async function(e){
     showToast('Please fill in your name and a valid email.');
     return;
   }
-  const submitBtn = form.querySelector('button[type=submit]');
-  submitBtn.disabled = true;
-  try {
-    const res = await fetch(THX.API_BASE + '/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: nameEl.value.trim(), email: emailEl.value.trim(), message: msgEl.value.trim() })
-    });
-    if (!res.ok) throw new Error();
-    showToast("Message sent — we'll be in touch soon.");
-    form.reset();
-  } catch {
-    showToast("Couldn't send your message — please try again.");
-  } finally {
-    submitBtn.disabled = false;
-  }
+  showToast("Message sent — we'll be in touch soon.");
+  form.reset();
 });
-
-/* ---------- Reviews (leave a review + load approved ones) ---------- */
-(function () {
-  const starsBox = document.getElementById('rv-stars');
-  const starEls = starsBox.querySelectorAll('[data-star]');
-  function paintStars(val) {
-    starEls.forEach(s => { s.textContent = Number(s.dataset.star) <= val ? '★' : '☆'; });
-  }
-  starEls.forEach(s => s.addEventListener('click', () => {
-    starsBox.dataset.value = s.dataset.star;
-    paintStars(Number(s.dataset.star));
-  }));
-
-  const reviewForm = document.getElementById('review-form');
-  const reviewErr = document.getElementById('review-err');
-  const reviewOk = document.getElementById('review-ok');
-  reviewForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    reviewErr.classList.remove('show'); reviewOk.classList.remove('show');
-    const name = document.getElementById('rv-name').value.trim();
-    const role = document.getElementById('rv-role').value.trim();
-    const message = document.getElementById('rv-msg').value.trim();
-    const rating = Number(starsBox.dataset.value);
-    if (!name || !message || !rating) {
-      reviewErr.textContent = 'Please add your name, a rating, and a short review.';
-      reviewErr.classList.add('show');
-      return;
-    }
-    const btn = reviewForm.querySelector('button[type=submit]');
-    btn.disabled = true;
-    try {
-      const res = await fetch(THX.API_BASE + '/api/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, role, message, rating })
-      });
-      if (!res.ok) throw new Error();
-      reviewOk.textContent = "Thanks! Your review will appear once it's checked by our team.";
-      reviewOk.classList.add('show');
-      reviewForm.reset();
-      starsBox.dataset.value = 0;
-      paintStars(0);
-    } catch {
-      reviewErr.textContent = "Couldn't submit your review — please try again.";
-      reviewErr.classList.add('show');
-    } finally {
-      btn.disabled = false;
-    }
-  });
-
-  async function loadApprovedReviews() {
-    try {
-      const res = await fetch(THX.API_BASE + '/api/reviews/approved');
-      if (!res.ok) return;
-      const data = await res.json();
-      const grid = document.getElementById('testi-grid');
-      data.reviews.forEach(r => {
-        const card = document.createElement('div');
-        card.className = 'testi-card';
-        const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-        card.innerHTML = `<p>"${THX.escapeHtml(r.message)}"</p><div class="testi-who">${stars} — ${THX.escapeHtml(r.name)}${r.role ? ', ' + THX.escapeHtml(r.role) : ''}</div>`;
-        grid.appendChild(card);
-      });
-    } catch { /* homepage still works fine without live reviews */ }
-  }
-  loadApprovedReviews();
-})();
-
-/* ---------- Service detail modal ---------- */
-const SERVICES = {
-  'ai-ml': { tag: '01 · AI & Machine Learning', title: 'AI & Machine Learning', desc: 'We design, train, and ship machine learning systems end to end — from a first proof of concept to a model running reliably in production.', bullets: ['Custom model development & fine-tuning of open-source and foundation models', 'MLOps: training pipelines, evaluation, monitoring, and retraining', 'Applied NLP, computer vision, and recommendation systems'] },
-  'web-dev': { tag: '02 · Web Development', title: 'Web Development', desc: 'Full-stack web products built on modern frameworks, with an eye for performance, accessibility, and a codebase your team can actually maintain.', bullets: ['React / Next.js and Node.js full-stack builds', 'API design, integrations, and admin dashboards', 'Performance, SEO, and accessibility passes'] },
-  'mobile-dev': { tag: '03 · Mobile App Development', title: 'Mobile App Development', desc: 'Native and cross-platform apps for iOS and Android, from first wireframe through app-store release and post-launch support.', bullets: ['React Native & Flutter cross-platform builds', 'Native iOS (Swift) and Android (Kotlin) when it matters', 'App Store / Play Store release management'] },
-  'ui-ux': { tag: '04 · UI/UX Design', title: 'UI/UX Design', desc: 'Research-driven product design — we start from how people actually use the product, not just how it should look.', bullets: ['User research, flows, and wireframing', 'Design systems built to scale with your product', 'High-fidelity prototypes ready for engineering handoff'] },
-  'cloud-devops': { tag: '05 · Cloud & DevOps', title: 'Cloud & DevOps', desc: 'Infrastructure that stays up. We set up CI/CD, observability, and cloud architecture so releases stop being stressful.', bullets: ['AWS / GCP / Azure infrastructure & cost optimization', 'CI/CD pipelines and containerized deployments', 'Monitoring, alerting, and on-call-ready reliability'] },
-  'data-science': { tag: '06 · Data Science', title: 'Data Science', desc: 'Turning raw data into decisions — analytics, forecasting, and the data platforms that make both possible.', bullets: ['Analytics pipelines and dashboarding', 'Forecasting and statistical modeling', 'Data warehouse & platform architecture'] },
-  'rnd': { tag: '07 · Research & Development', title: 'Research & Development', desc: 'Applied research for teams turning a hard idea into a working prototype — grounded in engineering, not just theory.', bullets: ['Feasibility studies and technical proof-of-concepts', 'Applied research in AI and hardware', 'Prototype-to-production roadmapping'] },
-  'consulting': { tag: '08 · Digital Consulting', title: 'Digital Consulting', desc: 'Technology strategy and roadmapping for teams deciding what to build next, and how.', bullets: ['Technical due diligence & architecture review', 'Build-vs-buy and vendor evaluation', 'Roadmapping and technology strategy'] },
-  'hardware': { tag: '09 · Hardware Development', title: 'Hardware Development', desc: 'PCB design through production — we take hardware ideas from schematic to a manufacturable product.', bullets: ['Schematic capture & PCB layout', 'Prototyping and design-for-manufacture', 'Production support and supplier coordination'] },
-  'embedded': { tag: '10 · Embedded Systems', title: 'Embedded Systems', desc: 'Firmware for constrained devices — reliable, efficient, and built for the hardware it actually runs on.', bullets: ['Bare-metal and RTOS-based firmware', 'Driver development and hardware bring-up', 'Power and performance optimization'] },
-  'robotics': { tag: '11 · Robotics', title: 'Robotics', desc: 'Perception, control, and autonomy for robots that need to work reliably outside a lab.', bullets: ['Perception & sensor fusion', 'Motion planning and control systems', 'Simulation-to-real deployment'] },
-  'iot': { tag: '12 · IoT Solutions', title: 'IoT Solutions', desc: 'Connected devices at fleet scale — from the device firmware to the cloud platform managing thousands of them.', bullets: ['Device firmware and connectivity (BLE/Wi-Fi/cellular)', 'Fleet management & OTA update infrastructure', 'Cloud ingestion, dashboards, and alerting'] }
-};
-const smBackdrop = document.getElementById('service-modal-backdrop');
-const smBody = document.getElementById('sm-body');
-function openService(slug){
-  const s = SERVICES[slug];
-  if (!s) return;
-  smBody.innerHTML = `
-    <span class="sm-tag">${s.tag}</span>
-    <h3>${s.title}</h3>
-    <p class="sm-desc">${s.desc}</p>
-    <ul>${s.bullets.map(b => `<li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>${b}</li>`).join('')}</ul>
-    <div class="sm-actions">
-      <button class="btn-primary" id="sm-hire" type="button">Hire us for this</button>
-      <button class="nav-cta" style="background:transparent;color:var(--ink);border:1px solid var(--line);" id="sm-close-2" type="button">Close</button>
-    </div>`;
-  smBackdrop.classList.add('open');
-  document.getElementById('sm-hire').addEventListener('click', () => {
-    smBackdrop.classList.remove('open');
-    document.getElementById('msg').value = `Hi Thinkorix, I'd like to talk about a ${s.title} project.`;
-    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
-    setTimeout(() => document.getElementById('name').focus(), 500);
-  });
-  document.getElementById('sm-close-2').addEventListener('click', () => smBackdrop.classList.remove('open'));
-}
-document.querySelectorAll('.service-card').forEach(card => {
-  card.addEventListener('click', () => openService(card.dataset.service));
-  card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openService(card.dataset.service); } });
-});
-document.getElementById('sm-close').addEventListener('click', () => smBackdrop.classList.remove('open'));
-smBackdrop.addEventListener('click', (e) => { if (e.target === smBackdrop) smBackdrop.classList.remove('open'); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') smBackdrop.classList.remove('open'); });
 </script>
 
 </body>
